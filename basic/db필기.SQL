@@ -1,0 +1,326 @@
+                            <3일차 DB>
+
+
+# xargs는 입력받는 파일을 한줄씩 읽는것을 의미
+# ls -al 을 입력 후 권한관계
+# chmod, chown 
+# rwx(421) read, write, execute
+# vi에디터 실습
+# vi에서는 항상 esc를 눌러서 명령모드로 가는 습관을 기르자
+
+!!dbms란
+    databaseManagement System 
+    Mysql, mariaDB, Oracle, Postgres,MongoDB,Redls
+        mongodb,redls - noSql
+    이중 우리는 '관계형 데이터 베이스'에 대해 학습할예정
+
+    mysql,mariadb,oracle
+
+    관계형데이터베이스(RDB)
+        서로 관계를 갖는 데이터들의 집합
+        테이블, 행,열 등의 구조로 데이터가 구조화
+        (엑셀을 프로그램화 시켰다) 
+
+
+!!mariaDB
+
+    MySQL의 포크(복사본)로 2009년에 시작되었고, MySQL의 기본적인 특성 및 구조를 그대로
+    유지하면서 일부 차이점과 추가 기능을 포함
+
+    mariaDB의 특징
+        완전한 오픈소스
+        지속적인 발전가능성
+        무료
+        뛰어난 성능 및 최적화
+        mysql의 오라클 인수 이후 비 오픈소스화 됨에 따라 mysql의 자리를 대체할것으로 예상
+
+    Oracle - 기본은 유료
+    mysql - 무료, 상업용 유료
+    mariadb - 오픈소스
+
+
+# spring boot, aws , restapi -o
+# legacy jsp - x
+
+!!SQL문
+
+    SQL문이란? DBMS에서 사용하는 프로그래밍 language -> SQL
+    CRUD - Create, Read, Update, Delete의 의미/ 생성,조회,수정,삭제
+        "CRUD"를 개발해보세요
+        1. DB구축(CRUD)
+        2. spring, java개발 -> 4가지
+    SQL 구문도 크게 세가지로 구분
+        DDL - data definition language _ 데이터베이스나 테이블 등을 생성,삭제하거나 그 '구조'를 변경
+        create, alter, drop
+
+        DML - data manipulation languae _ 데이터베이스에 저장된 '데이터'를 처리하거나 조회
+        insert, update, delete, select
+
+        DCL - data control language _사용자 권한 부여
+        grant,revoke 등
+
+!!테이블
+
+    열
+        열은 필드 또는 속성
+        구체적인 속성은 컬럼의 성격 그 자체를 의미
+        필드는 컬럼의 구체적인 데이터 하나하나의 개별 데이터 항목
+    
+    행
+        튜플 또는 레코드
+    
+    값
+        데이터라고도 칭함
+    
+    키
+        행의 식별자로 이용되는 열
+        테이블에 저장된 레코드를 고유하게 식별하는 키를 기본키(PrimaryKey)
+        # pk로 지정하는순간 not null과 유니크가 적용이 된다
+    
+    외래 키(ForeignKey)
+        외래키는 두 테이블을 서로 연결하는 데 사용되는 키
+
+!!실습
+google 마리아디비 다운로드(기본 default 값으로 설치)
+
+    윈도우는 패스를 따로 잡아줘야한다.
+    내 pc - 속성 - 환경변수 - path - 편집 - C:\Program Files\MariaDB 11.3\bin -붙여넣기
+    -윈도우 파워쉘에서 mariadb --version 타이핑 후 잘 되는지 확인
+
+        윈도우 파워쉘에서
+        mariadb -u root -p 입력해서 접속
+        show databases;
+
+GUI툴 설치하기
+
+    workbench
+        mysql계열에서 많이 사용
+        https://dev.mysql.com/downloads/workbench/
+    connention - 비밀번호 저장후 생성
+
+    show databasses; 번개모양 ctrl +enter
+
+게시판 데이터베이스(스키마)생성
+스키마 안에 글쓴이 테이블, 글목록테이블 생성
+
+author 테이블
+autohr테이블에는 email,password,회원이름 등의정보가 있을것
+
+스키마생성
+    
+    mariadb -u root -p
+    create database board;
+    show databases; 로 잘 만들어졌는지 확인해보기
+
+    use board;
+    
+데이터베이스 삭제
+    drop database board;
+
+테이블생성*****
+    작가 테이블
+        id(int, pk, auto),name(varchar255),email(varchar255),password(varchar255),role(varchar50)
+    글목록 테이블
+        id(int.pk.auot),title(varchar255),contents(varchar255).author_id,created_at
+        author_id: author테이블의 id fk
+
+    Create Table Author
+
+-- 데이터베이스 생성
+CREATE DATABASE board;
+-- 데이터베이스 선택
+USE board;
+-- author 테이블 신규 생성
+CREATE TABLE author(
+    id INT, 
+    name VARCHAR(255), 
+    email VARCHAR(255), 
+    password VARCHAR(255), 
+    test1 VARCHAR(255), 
+    PRIMARY KEY (id)
+);
+SHOW TABLES;
+-- 테이블 컬럼조회
+DESCRIBE author;
+-- POST 테이블 신규 생성
+CREATE TABLE posts(
+id INT PRIMARY KEY, 
+title VARCHAR(255), 
+content VARCHAR(255), 
+author_id INT, 
+FOREIGN KEY(author_id) REFERENCES author(id)
+);
+
+
+PrimaryKey를 걸게되는 칼럼에 대해서는 unique, not null 계약조건 부여
+
+만약 not null 조건이 있다면 author에 없는 데이터는 post에 생성불가
+author가 삭제될 때 post에 데이터가 남으면 author 삭제 불가
+author의 id가 수정될때 post에 데이터가 남아있으면 author 수정 불가
+삭제, 수정에 대해서는 기본적으로 제약(restric)을 갖고 있으나, 옵션을 줘서 변경가능
+
+!!테이블, 컬럼 정보조회
+
+    -- 테이블 컬럼상세 조회
+    SHOW FULL COLUMNS FROM author;
+    
+    -- 테이블 생성문 조회
+    SHOW CREATE TABLE posts;
+-- 'posts', 'CREATE TABLE `posts` (\n  `id` int(11) NOT NULL,\n  
+-- `title` varchar(255) DEFAULT NULL,\n  `content` varchar(255) 
+-- DEFAULT NULL,\n  `author_id` int(11) DEFAULT NULL,\n  PRIMARY KEY (`id`),
+-- \n  KEY `author_id` (`author_id`),\n  CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `author` (`id`)\n) 
+-- ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci'
+
+    -- 참조관계 및 제약조건 정보조회
+    SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE TABLE_NAME = 'posts';
+
+    인덱스 조회
+        SHOW INDEX FROM 테이블명;
+        제약조건 정보조회와 인덱스조회는 상당수 일치(PK,FK 제약조건은 인덱스를 생성)
+        인덱스란 조회의 성능을 높이기 위한 별도 페이지라 이해하면 될 것
+
+    -- 근데 인덱스가 뭔지 트리가 뭔지;; ㅜㅜ 
+    -- ..
+
+!!DDL-create
+
+    테이블 생성
+            
+            create table 테이블이름
+            (
+                필드이름1필드타입1[제약조건],
+                필드이름2필드타입2[제약조건]
+                ...
+                [테이블제약조건]
+            )
+
+!!DDL alter
+
+    -- 테이블 정보 변경
+    -- 테이블 이름 변경
+
+            alter TABLE 테이블명 RENAME 새로운테이블명;
+            alter table posts rename post;
+
+    -- 컬럼 추가
+
+            alter table 테이블명 add COLUMN 컬럼명 자료형 [null 또는 not null]
+            alter table author add COLUMN role varchar(50)
+
+    -- 필드 타입 변경 (modify)
+
+            alter table author modify COLUMN name VARCHAR(100) NOT NULL
+
+            원래 not null이 걸려있었다면?
+            덮어씌워짐으로 제약조건을 사전에 확인하자
+
+
+    -- 컬럼 이름변경 - content - contents
+
+            alter table 테이블명 change column 기본컬럼명 새로운컬럼명 타입 [제약조건]
+            
+    -- 컬럼 삭제 
+
+            alter table 테이블명 drop column 컬럼명.
+    
+    인덱스를 쓰면 왜 빨라지는 이유
+인덱스의 실체를 본적이 있는건가?
+
+-- 실습 2
+
+-- 데이터베이스 삭제
+drop database 데이터베이스명;
+
+-- 테이블 삭제
+drop table 테이블이름
+
+테이블의 데이터만 지우고 싶을 때
+delete from 테이블이름
+truncate table 테이블이름 
+
+if exists
+특정 개체(베이스나 테이블)가 존재하는 경우에만 명령어를 실행
+drop database if exists abc;
+
+
+
+post 테이블의 contents 컬럼 글자수 3000으로 변경
+author 테이블에 address 컬럼 varchar 255로 추가
+post테이블 생성문 미리확인 - post테이블삭제 - post테이블 다시 생성
+
+
+            alter table post modify COLUMN contents VARCHAR(3000)
+
+            alter table author add COLUMN address varchar(255)
+
+           show create table post;
+           drop table post;
+
+            create alter 
+
+
+
+CREATE TABLE `post` (
+   `id` int(11) NOT NULL,
+   `title` varchar(255) DEFAULT NULL,
+   `contents` varchar(3000) DEFAULT NULL,
+   `author_id` int(11) DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `author_id` (`author_id`),
+   CONSTRAINT `post_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `author` (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+
+--  insert, select****, update, delete
+
+!!! insert
+
+테이블에 새로운 레코드를 추가
+insert into 테이블이름(필드이름1,필드이름2,필드이름3,...)values(데이터값1,데이터값2,데이터값3)
+    insert into author(id, name, email) values(1,'kim','abc@naver.com');    
+    -- 기본적으로 문자열은 ''로 쓰도록 하자
+    select * from author 
+    -- 조회하는 방법
+
+듐났다 (duplicate) - 필수값이 하나라도 없으면 오류가 생기는것 
+
+ author 데이터 5개 추가
+ address는 데이터 넣지 말것
+
+ post 데이터 5개 추가
+ 2개는 저자가 있는 데이터
+ 2개는 저자가 비어있는 데이터 > author_id에 not null 조건없다는 사실 확인
+ 1개는 저자가 author테이블에 없는 데이터 추가 > 에러 발생 확인하기
+
+DML
+insert 
+
+
+update 
+
+    테이블 레코드의 내용을 수정
+    update 테이블이름 set필드이름1=데이트값1, 필드이름2=데이터값2.... where 필드이름=데이터값
+
+    만약 where 절을 생략하면, 해당 테이블의 모든 레코드값이 위 설정대로 수정되므로 유의
+        예) update author set email='abc@test.com' where id=1;
+        where 을 안쓰면 전체 적용
+
+    여기서 =의 쓰임새는 2가지
+    where문 뒤에 나오는 비교문은 jave기준으로 ==로
+    어떤값을 set할때도 =을 사용하여 대입(jave=과동일)
+
+
+delete
+
+    딜리트에 *이 필요없는 이유
+        의미자체가 한 줄을 다 지우는거 *이 필요없음
+    
+    author 데이터중 id가 4인 데이터를 email을 abc@naver.com. name을 abc로 변경
+    post 에 글쓴적이 없는 author 데이터 1개 삭제
+    post 에 글쓴적이 있는 author 데이터 1개 삭제 > 에러 > 조치후 삭제
+
+
+
+
