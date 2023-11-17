@@ -535,7 +535,7 @@ super-user 데이터로 인서트
 
 admin으로 데이터 설정 후
 
-enum타입
+enum타입 ******
     미리 들어갈 수 있는 특정 데이터의 값을 지정
     컬럼명 enum('데이터값1',,,....)
     not null default 'user' 등의 옵션도 추가 가능
@@ -545,5 +545,111 @@ enum타입
     role enum('admin','user'...)
     gendel enum('male','female'...)
 
+alter문은 not null 로 하는데 null이 있으면 말이 x
+user로 업데이트 하면 됨.
+update author set role='user'
 alter table author modify column role enum('user','admin') not null dafult 'user';
-helloworld
+
+타입 
+
+time
+date
+    날짜를 저장할 수 있는 타입yyyy-mm-DD
+datetime(m)
+    날짜와 함께 시간까지 저장, m지정시 소수점 microseconds
+    yyyy-mm-dd hh:mm:ss 
+    가장많이 사용
+    jave의 localdatetime과 sync
+
+datetime default current_timestamp
+    현재시간을 default로 삽입하는 형식d
+
+    utc = kst -9
+    kst
+
+-- db는 UTC로 놔두어도 상관없다.
+
+실습 
+
+post 에 datetime으로 created_time 컬럼 추가 및 디포트로
+현재시간 들어가도록 설정
+datetime(6) default current_timestamp
+컬럼 추가 후 insert 테스트
+
+
+alter table post add COLUMN created_time datetime default current_timestamp;
+
+insert 
+
+비교 연산자
+
+= select * from post where id !=1;
+
+!= (not equal) , <>
+select * from abc where name !='johoon' 
+-- != 또는 <>
+
+<, <=,>,>=
+-- =은 항상 오른쪽에!!!!!!
+
+is null, is not null
+
+between min and max
+    피연산자의 값이 min 크거나 max 보다 작으면 참을 반환함(이상, 이하)
+
+in(), not in() ********외우기
+-- id in(1,2,3)에 1,2,3 이 있으면 다 나와
+
+프로그래머스 sql 문제풀이 (비교연산자(is null))-나이 정보가 없는 회원 수 구하기
+
+논리연산자
+
+A AND B 
+    &&도 가능
+    SELECT * FROM author where name ="조훈" AND "30";
+
+OR
+    ||
+    SELECT * FROM author WHERE name = "조훈" OR "30";
+
+NOT
+    !
+    SELECT * FROM author WHERE name =! "조훈"
+
+실습
+
+author 테이블의 id가 1,2,4가 아닌 데이터 조회 (not in사용)
+select * from author where id not in (1,2,4);
+post테이블의 id가 2~4까지 데이터 조회
+    between활용
+    select * from post where id between 2 and 4;
+    and조건 활용
+    select * from post where id = 2 and id =4;(2이기도하면서 4이여야 함)
+    or 조건 활용
+    select * from post where id = 2 or id =4;
+
+
+검색 패턴
+
+    like 
+        특정 패턴의 문자열을 찾기위한 키워드로 사용이 됨
+        일반적으로 퍼센트오아 함께 사용
+        select *from author where name like '조%' 조로 시작하는
+        select * from author where name like '%훈' 훈으로 끝나는
+        select * from author where name like '%훈%' 문자사이에 훈이라는것
+    not like
+
+
+    REGEXP
+        정규표현식을 토대로 패턴 연산 수행
+        특정한 문자 패턴을 약속한것 개발자와 시스템간에 
+        알파벳으로 이루어진 이름만을 조회하고 싶을때는
+        SELECT * FROM author WHERE name REGEXP '[a-z]'
+        a-z까지 들어있으면 참이 된다.
+        [회원가입시]
+    
+    not REGEXP  ** 자바에서 본격적으로 
+
+    select * from author where name like 'j%'
+    select * from author where name like '%o%'
+    select * from author where name like '%n'
