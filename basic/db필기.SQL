@@ -79,6 +79,7 @@
     
     외래 키(ForeignKey)
         외래키는 두 테이블을 서로 연결하는 데 사용되는 키
+        외래키가 설정되면 post author 테이블 데이터의 생성 삭제 수정에 대해 제약이 발생한다.
 
 !!실습
 google 마리아디비 다운로드(기본 default 값으로 설치)
@@ -139,6 +140,9 @@ CREATE TABLE author(
     test1 VARCHAR(255), 
     PRIMARY KEY (id)
 );
+
+primary key, foreign key 테이블차원에서 제한을 많이 건다.
+
 SHOW TABLES;
 -- 테이블 컬럼조회
 DESCRIBE author;
@@ -152,9 +156,10 @@ FOREIGN KEY(author_id) REFERENCES author(id)
 );
 
 
+
 PrimaryKey를 걸게되는 칼럼에 대해서는 unique, not null 계약조건 부여
 
-만약 not null 조건이 있다면 author에 없는 데이터는 post에 생성불가
+만약 not null 조건이 있다면 author_id에 없는 데이터는 post에 생성불가
 author가 삭제될 때 post에 데이터가 남으면 author 삭제 불가
 author의 id가 수정될때 post에 데이터가 남아있으면 author 수정 불가
 삭제, 수정에 대해서는 기본적으로 제약(restric)을 갖고 있으나, 옵션을 줘서 변경가능
@@ -166,11 +171,6 @@ author의 id가 수정될때 post에 데이터가 남아있으면 author 수정 
     
     -- 테이블 생성문 조회
     SHOW CREATE TABLE posts;
--- 'posts', 'CREATE TABLE `posts` (\n  `id` int(11) NOT NULL,\n  
--- `title` varchar(255) DEFAULT NULL,\n  `content` varchar(255) 
--- DEFAULT NULL,\n  `author_id` int(11) DEFAULT NULL,\n  PRIMARY KEY (`id`),
--- \n  KEY `author_id` (`author_id`),\n  CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `author` (`id`)\n) 
--- ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci'
 
     -- 참조관계 및 제약조건 정보조회
     SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
@@ -242,7 +242,7 @@ truncate table 테이블이름
 
 if exists
 특정 개체(베이스나 테이블)가 존재하는 경우에만 명령어를 실행
-drop database if exists abc;
+drop database 또는 TABLE IF EXISTS abc;
 
 
 
@@ -253,7 +253,7 @@ post테이블 생성문 미리확인 - post테이블삭제 - post테이블 다�
 
             alter table post modify COLUMN contents VARCHAR(3000)
 
-            alter table author add COLUMN address varchar(255)
+            alter table author add COLUMN address varchar(255)  
 
            show create table post;
            drop table post;
@@ -314,13 +314,91 @@ update
 
 delete
 
+    DELETE FROM author WHERE
     딜리트에 *이 필요없는 이유
         의미자체가 한 줄을 다 지우는거 *이 필요없음
     
     author 데이터중 id가 4인 데이터를 email을 abc@naver.com. name을 abc로 변경
+    update author set email='abc@naver.com', name='abc' where id=4;
     post 에 글쓴적이 없는 author 데이터 1개 삭제
+    
+    방법1.
+    delete from post where author_id=2;
+    delete from author where id=2;
+
+    방법 2.
+    update post set author_id = null where author_id = 2;
+    delete from author where id = 2;
+
     post 에 글쓴적이 있는 author 데이터 1개 삭제 > 에러 > 조치후 삭제
 
 
+TRUCATE 
+ delete 는 storage까지 삭제하지는 않아 복구가 가능 
+ delete 는 log 를 남김
+ delete의 삭제속도는 truncate보다 느림
+
+
+select 
+    select 필드이름 from 테이블이름 [where 조건]
+    select *from author.
+
+    select * from author where id=1 전부 다 조회
+    select name,email from author where id=1 아이디1일사람 조회
+    select * from author where id>1 아이디가 1보다 큰 사람 조회
+    select * from author where id>1 and name = 'kim' 아이디가 1보다 크면서 이름이 kim인 사람
+
+프로그래머스 sql 문제 풀이(SELECT,WHERE-어린동물찾기)
+
+-4일차- db
+
+테이블간의 관계성
+author 와 post (고객테이블, 
+회원을 탈퇴한다고 하면 post를 어떻게 놔둘것인가?
+회원가입 - 글을 열심히 썻다 - 회원탈퇴
+현재는 불가능 ( on update, on delete 와 같이 restrict옵션이 걸려있기 때문에 )
+현재는 ForeignKey REFERENCES on author 외에 별다른 옵션이 적혀있지 않다.
+cascade 옵션 : 따라가는것 (author을 지우면 post도 지워짐)
+set null : 부모테이블이 업데이트 또는 디리트가 되면 자식테이블은 null 로 세팅을 하겠다.
+null 세팅 시 (익명)
+
+    강사님은 set null을 추천 (현실에서는 아무것도 지우지 않기때문)
+    실무에서는 컬럼 하나 추가 (탈퇴여부 Y,N)
+    if(탈퇴컬럼 == yes), 탈퇴한고객
+    if(탈퇴컬럼 == no), 일반고객
+
+관계성에 대한 이해도가 가장 중요하다 
+
+주요 제약조건(PK,FK)를 걸게되면 INDEX가 자동생성
+INDEX는 조회성능을 위한 목차페이지
+SHOW INDEX FROM author;
+MODIFY COLUMN 
+
+SELECT * FROM author WHERE id>1 and (그리고) / or (또는) name = 'kim';
+SELECT ANIMAL_ID, NAME FROM ANIMAL_INS WHERE INTAKE_CONDITION != 'Aged'
+
+
+SELECT
+
+    -- SELECT문으로 선택한 결과를 ORDER BY 컬럼명
+    SELECT * FROM author ORDER BY name desc
+    -- 기본 default 값은 오름차순이나 DESC를 쓸 경우 내림차순으로 조회를 한다.
+    -- 여러 필드의 데이터를 쉼표를 사용하여 여러기준으로 정렬할 수도 있다.
+    -- ORDER BY 생량시 PK를 기준으로 오름차순 정렬하여 결과값 반환
+    SELECT * FROM AUTHOR LIMIT number : 반환할 행의 최대 수를 지정 (옛날 데이터는 의미가 없어서 리밋을 걸어 최신데이터의 부분만 보는것 )
+        SELECT * FROM AUTHOR ORDER BY ID DESC LIMIT 2 (역으로 한번 뒤집고 숫자로 갯수 제한)
+    -- 별칭을 이용한 처리 (alias)
+    --     테이블과 필드에 임의로 별칭을 부여하고 해당 별칭을 SELECT문에서 사용
+    --     SELECT 필드이름 AS 별칭 FROM 테이블이름;
+    --     SELECT 필드이름 FROM 테이블이름 AS 별칭;
+                프로그래머스 sql 문제 풀이SELECT, ORDER BY - 역순 정렬하기
+
+    SELECT * FROM author ORDER BY name ASC, email DESC;(desc, abc 생략 시 asc 적용)
+
+--  alias 를 이용한 select 문
+
+    select name as 이름 from author; 
+    -- as는 생략이 가능하다 
+    select name , email from author as a;
 
 
