@@ -546,3 +546,4 @@ enum타입
     gendel enum('male','female'...)
 
 alter table author modify column role enum('user','admin') not null dafult 'user';
+helloworld
