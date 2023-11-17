@@ -670,6 +670,8 @@ post테이블의 id가 2~4까지 데이터 조회
             DATE_FORMAT 함수는 날짜/시간 타입의 데이터를 지정된 형식의 문자열로 변환
             가장 많이 사용
             DATE_FORMAT(date, format)
-                SELECT DATE_FORMAT('20200-01-01 17:12:00','%Y-%M-%d'); = 2020-01-01
+                SELECT DATE_FORMAT('20200-01-01 17:12:00','%Y-%m-%d'); = 2020-01-01
 
                 조건에 맞는 도서 리스트 출력
+
+select * from post;
