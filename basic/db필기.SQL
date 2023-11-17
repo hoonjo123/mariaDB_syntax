@@ -653,3 +653,23 @@ post테이블의 id가 2~4까지 데이터 조회
     select * from author where name like 'j%'
     select * from author where name like '%o%'
     select * from author where name like '%n'
+
+    타입변환
+
+        CAST 
+            CAST(a AS type)
+            a값을 type으로 변환
+            보통 정수 값을 date타입으로 변환하는데 사용
+            select cast(20200101 AS DATE); =>2020-01-01
+
+        CONVERT
+            문자열을 날짜/시간으로 변환하는데 사용
+            CONVERT('2020-01-01',DATE); => 2020-01-01
+        
+        DATE_FORMAT
+            DATE_FORMAT 함수는 날짜/시간 타입의 데이터를 지정된 형식의 문자열로 변환
+            가장 많이 사용
+            DATE_FORMAT(date, format)
+                SELECT DATE_FORMAT('20200-01-01 17:12:00','%Y-%M-%d'); = 2020-01-01
+
+                조건에 맞는 도서 리스트 출력
