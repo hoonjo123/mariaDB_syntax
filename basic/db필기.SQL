@@ -401,4 +401,148 @@ SELECT
     -- as는 생략이 가능하다 
     select name , email from author as a;
 
+-- 게시판 회원은 총 5명이 되도록 만들고, 게시판에 실명으로 글이 쓰여진 게시글은 총 3건, 익명으로 글이 쓰여진 글은 총 2건이 있도록 데이터 insert
 
+-- 게시판의 회원을 모두 delete하되, 기존에 posting 된 글은 삭제되지 않고 남아있도록 하여라
+-- where author_id != null
+
+-- post의 글을 3개만 조회하되, title을 기준으로 오름차순하고 만약 제목이 같은경우 contents로 오름차순이 되도록 조회
+
+insert into author( id, name ) values( 1,'jo');
+insert into author( id, name ) values( 2,'jo');
+insert into author( id, name ) values( 3,'jo');
+insert into author( id, name ) values( 4,'jo');
+insert into author( id, name ) values( 5,'jo');
+
+insert into post(id, title, contents, author_id) values(1, '오늘은데이터', 'johoon2 is...', 2)
+insert into post(id, title, contents, author_id) values(2, '오늘은데이터2', 'johoon2 is...', 2)
+insert into post(id, title, contents, author_id) values(3, '오늘은데이터3', 'johoon2 is...', 1)
+insert into post(id, title, contents) values(4, '오늘은데이터4', 'johoon2 is...', 4)
+insert into post(id, title, contents) values(5, '오늘은데이터5', 'johoon2 is...', 5)
+
+update post set author_id = null where author_id =! null;
+delete from author;
+select*from post order by title asc, contents desc limit 3;
+
+
+
+타입 - 숫자
+
+    테이블의 타입 확인
+        DESCRIBE 테이블명,
+
+        숫자 타입
+            정수
+                TINYINT
+                    -128~127 범위, 1바이트(8bit) 2^8 = 256
+                    JAVA의 BYTE와 매핑
+                    ex) age
+                INT
+                    4바이트
+                    JAVA의 INT타입과 매핑
+                BIGINT - 
+                -- int는 너무 작기때문에 대부분 bigint로 잡기도 한다
+                -- 하지만 함부로 정할 수는 없다. 왜냐면 1row당 4바이트의 낭비가 있다고 한다면 어마어마한 낭비이다.
+                -- 몇십억의 데이터가 있다면 ... 몇십억 * 4bite ... !!!??
+                    8바이트
+                    JAVA의 LONG타입과 매핑
+                UNSIGNED 타입을 사용하여 양수만 표현가능
+                    표현값 2배로 증가
+                    TINYINT UNSIGNED 이렇게 사용한다면 255까지 사용가능 EX)나이
+                    ex) age TINYINT UNSIGNED 
+실수
+    부동 소수점 타입  
+        FLOAT, DOUBLE
+        오차가 발생할 여지가 있음
+
+    고정 소수점 타입    
+        DECIMAL(M,D)
+            JAVA의 Bigdecimal
+            M은 총자릿수 (정수부+소수부)를 의미하고 65자리까지 표현가능
+            D는 소수부 의미
+            정확한 숫자 표현을 위해 사용 
+            -- 그런 이유로 DECIMAL 을 많이 쓴다. 
+        create table post (price DECIMAL(10,3)
+
+[{z}]
+
+
+실습
+
+    author 테이블에 age 데이터 tinyint unsigned로 추가
+        255이하로 insert, 255초과로 insert 테스트
+
+-- alter table author add COLUMN age varchar(50)
+-- insert into author(age) values(200); 
+
+    post에 price라는 원고료컬럼을 추가. 원고료 컬럼은 총자릿수 10자리 및 소수점단위는 3자리까지 가능.
+
+-- alter table post add column price DECIMAL(10,3);
+
+        컬럼 추가 후 비어있는 컬럼에 숫자 update test. (소수점 3이하 test, 소숫점 3초과 테스트)
+
+update post set price=1000.5 where id=1;
+update post set price=1000.555 where id=2;
+update post set price=1000.55555 where id=3;
+
+
+문자타입
+
+    char(m) <- varchar을 주로 씀
+        m은 문자열의 최대 길이를 의미
+        고정 길이의 문자열(0~255까지 설정가능)
+        정해진 자릿수 문자에 제한을 두기 위해서는 사용
+
+        예를 들어 char(255)라고 하면 10바이트만 넣더라도 255바이트 차지
+
+    varchar(255)
+        java의 string 사용시 varchar
+        0부터 65,535까지 설정가능
+        가변 길이의 문자열(M을 통해 길이지정)
+        길이를 지정하더라도 실제 입력된 문자열의 길이만큼만 저장하고 사용
+        일반적으로 가장 많이 사용
+        예를 들어 varchar(255)라고 하면 10바이트를 넣으면 10바이트 차지
+
+    text
+        가변 길이 문자열
+        text 65,535바이트까지 저장 가능한 일반적인 문자열을 위한 타입 name TEXT
+        varchar보다 더 큰 범위의 표현이 가능 예)LONGTEXT 는 4GB
+        disk에 저장해서 조회속도가 varchar에 비해 느림
+        INDEX사용의 어려움(B-tree인덱싱 불가, full-text인덱스 가능)
+    
+create table table_blob(id int, myimg longblob);
+insert into table_blob(id,myimg) values(1,load_file("C:\Users\Playdata\Desktop\test_picture.jpg"));
+select hex(mying) from table_blob where id=1;
+
+-- 어떤 값이던지 이진법의 조합으로 변환해서 블럭데이터로 넣을 수도 있다.
+이미지로 변환하려면 각 프레임워크에 바이너리데이터 변환하는 기능이 있음.
+
+role 타입 enum타입으로 변경하고
+'user','admin'으로 enum타입 지정. not null default
+입력이 없을시 'user'로 세팅되도록 디포트 설정
+-- 지역코드, 도서코드, 제품코드 
+
+dml test
+admin으로 데이터 세팅후 인서트
+insert into author(id, name, role) values (3, 'admin', 'admin');
+-- 들어가는것을 확인 가능하다.
+super-user 데이터로 인서트
+-- 듐이 나는것을 확인 할 수 있다.
+롤 데이터 없이 인서트
+-- not null default
+-- 입력이 없을시 'user'로 세팅되도록 디포트 설정
+
+
+admin으로 데이터 설정 후
+
+enum타입
+    미리 들어갈 수 있는 특정 데이터의 값을 지정
+    컬럼명 enum('데이터값1',,,....)
+    not null default 'user' 등의 옵션도 추가 가능
+    -- not null로 하는데 만약에 비어있으면 user로 넣어주게땅
+
+    예)
+    role enum('admin','user'...)
+    gendel enum('male','female'...)
+
+alter table author modify column role enum('user','admin') not null dafult 'user';
