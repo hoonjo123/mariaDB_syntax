@@ -371,5 +371,14 @@ FROM USED_GOODS_BOARD
 WHERE CREATED_DATE = '2022-10-05'
 order by BOARD_ID desc
 
-트랜잭션 실습
+트랜잭션 실습(트랜, 트란)
+a쿼리
+b쿼리
+c쿼리
+commit;
+rollback;
+에러가 나면 rollback
+에러를 발생 rollback
+정상 실행되면 commit default 
+
 
